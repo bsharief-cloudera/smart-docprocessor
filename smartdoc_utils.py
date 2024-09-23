@@ -66,7 +66,37 @@ def document_postprocessing( model_output):
 
 
 
-def process_llm_output(llm_output):
+# def process_llm_output(llm_output):
+#     """
+#     Process the output from a custom Large Language Model and extract
+#     the edited text and corrections.
+
+#     Parameters:
+#     llm_output (str): The raw output string from the LLM.
+
+#     Returns:
+#     tuple: A tuple containing two elements:
+#            - edited_text (str): The extracted edited text.
+#            - corrections (str): The extracted corrections, or "None needed." if no corrections.
+#     """
+#     # Extract Edited Text
+#     edited_text_match = re.search(r"1\.\s*Edited Text:\s*'?(.+?)'?\s*(?=2\.|$)", llm_output, re.DOTALL)
+#     edited_text = edited_text_match.group(1).strip() if edited_text_match else "No edited text found."
+
+#     # Extract Corrections
+#     corrections_match = re.search(r"2\.\s*Corrections:\s*(.+)$", llm_output, re.DOTALL)
+#     if corrections_match:
+#         corrections = corrections_match.group(1).strip()
+#         # If corrections start with "[Your corrected text here]", remove it
+#         corrections = re.sub(r"^\[Your corrected text here\]\s*-?\s*", "", corrections)
+#         # Format each correction on a new line
+#         corrections = re.sub(r"(?:^|\s+)-\s*", "\n- ", corrections).strip()
+#     else:
+#         corrections = "None needed."
+
+#     return edited_text, corrections
+
+def process_llm_output(response):
     """
     Process the output from a custom Large Language Model and extract
     the edited text and corrections.
@@ -80,18 +110,20 @@ def process_llm_output(llm_output):
            - corrections (str): The extracted corrections, or "None needed." if no corrections.
     """
     # Extract Edited Text
-    edited_text_match = re.search(r"1\.\s*Edited Text:\s*'?(.+?)'?\s*(?=2\.|$)", llm_output, re.DOTALL)
+    # Modify regex to capture edited text with or without quotes
+    edited_text_match = re.search(r"1\. Edited Text:\s*(.*)", response)
     edited_text = edited_text_match.group(1).strip() if edited_text_match else "No edited text found."
-
-    # Extract Corrections
-    corrections_match = re.search(r"2\.\s*Corrections:\s*(.+)$", llm_output, re.DOTALL)
-    if corrections_match:
-        corrections = corrections_match.group(1).strip()
-        # If corrections start with "[Your corrected text here]", remove it
-        corrections = re.sub(r"^\[Your corrected text here\]\s*-?\s*", "", corrections)
-        # Format each correction on a new line
-        corrections = re.sub(r"(?:^|\s+)-\s*", "\n- ", corrections).strip()
-    else:
-        corrections = "None needed."
-
+    
+    # Extract the corrections
+    corrections_match = re.search(r"2\. Corrections:\s*(.*)", response, re.DOTALL)
+    corrections = corrections_match.group(1).strip() if corrections_match else "No corrections found."
+    
+    print("INSIDE process_llm_output")
+    # Print the results
+    print("Edited Text:")
+    print(edited_text)
+    print("\nCorrections:")
+    print(corrections)
+    print("DONE process_llm_output")        
     return edited_text, corrections
+
