@@ -111,7 +111,8 @@ def process_llm_output(response):
     """
     # Extract Edited Text
     # Modify regex to capture edited text with or without quotes
-    edited_text_match = re.search(r"1\. Edited Text:\s*(.*)", response)
+    #edited_text_match = re.search(r"1\. Edited Text:\s*(.*)", response)
+    edited_text_match = re.search(r"1\. Edited Text:\s*['\"]?(.*?)['\"]?\s*(?:\n|$)", response, re.DOTALL) 
     edited_text = edited_text_match.group(1).strip() if edited_text_match else "No edited text found."
     
     # Extract the corrections
