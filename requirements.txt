@@ -1,0 +1,4 @@
+llamacpp
+python-docx
+Flask
+werkzeug

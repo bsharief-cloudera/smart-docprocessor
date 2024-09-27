@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Document Proofer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Smart Document Proofer</h1>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Document Upload Form -->
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <label for="file">Upload Word Document:</label>
+        <input type="file" name="file" id="file" accept=".docx" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if file_uploaded %}
+    <h3>Document uploaded successfully! Now proofread the document.</h3>
+    <form method="POST" action="/proofread/{{ filename }}">
+        <button type="submit">Proofread Document</button>
+    </form>
+    {% endif %}
+
+    {% if processing_completed %}
+    <h3>Processing Completed in {{ processing_time }}. Proceed to download your files.</h3>
+    <a href="/download/{{ filename }}/edited">Download Edited Document</a>
+    <br>
+    <a href="/download/{{ filename }}/corrections">Download Corrections Document</a>
+    {% endif %}
+</body>
+</html>

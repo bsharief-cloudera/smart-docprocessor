@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Document Proofer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // JavaScript to handle the proofread button click and show real-time timer
+        function startProofreading(filename) {
+            document.getElementById('processing-message').style.display = 'block';
+            document.getElementById('timer').style.display = 'block';
+
+            // Timer logic
+            let startTime = new Date().getTime();
+            let timerInterval = setInterval(function() {
+                let now = new Date().getTime();
+                let elapsedTime = now - startTime;
+                let seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                let milliseconds = Math.floor((elapsedTime % 1000));
+
+                document.getElementById('timer').innerHTML = 'Time Elapsed: ' + seconds + '.' + milliseconds + ' seconds';
+            }, 10);  // Update timer every 10 milliseconds
+
+            // Send the proofread request asynchronously
+            fetch(`/proofread/${filename}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => {
+                    clearInterval(timerInterval);  // Stop the timer
+                    document.getElementById('processing-message').style.display = 'none';
+                    document.getElementById('timer').style.display = 'none';
+                    document.getElementById('result').innerHTML = data;
+                })
+                .catch(error => {
+                    clearInterval(timerInterval);  // Stop the timer
+                    document.getElementById('processing-message').style.display = 'none';
+                    document.getElementById('timer').style.display = 'none';
+                    document.getElementById('result').innerHTML = 'Error processing document';
+                });
+        }
+    </script>
+</head>
+<body>
+    <h1>Smart Document Proofer</h1>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Document Upload Form -->
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <label for="file">Upload Word Document:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if file_uploaded %}
+    <h3>Document uploaded successfully! Now proofread the document.</h3>
+    <form method="POST" onsubmit="event.preventDefault(); startProofreading('{{ filename }}');">
+        <button type="submit">Proofread Document</button>
+    </form>
+    {% endif %}
+
+    <!-- Processing message and timer -->
+    <div id="processing-message" style="display:none;">
+        <h3>Document is now getting processed for proof reading...</h3>
+    </div>
+    <div id="timer" style="display:none;"></div>
+
+    <!-- Result message after processing -->
+    <div id="result"></div>
+
+    {% if processing_completed %}
+    <h3>Processing Completed. Proceed to download your files.</h3>
+    <a href="/download/{{ filename }}/edited">Download Edited Document</a>
+    <br>
+    <a href="/download/{{ filename }}/corrections">Download Corrections Document</a>
+    {% endif %}
+</body>
+</html>
+
