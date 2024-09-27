@@ -3,5 +3,6 @@ node_modules
 *.pyc
 __pycache__
 .*
+*.docx
 !.gitignore
 !.experiments
