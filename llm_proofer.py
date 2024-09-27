@@ -1,9 +1,9 @@
 #imports and set up the local model
 from docx import Document
-from transformers import pipeline
 from llama_cpp import Llama
 from copy import deepcopy
-from smartdoc_utils import document_postprocessing, process_llm_output
+from smartdoc_utils import process_llm_output
+from deterministic_preprocessor import DeterministicPreprocessor
 model_path = "/home/cdsw/.cache/huggingface/hub/models--TheBloke--Karen_TheEditor_V2_STRICT_Mistral_7B-GGUF/snapshots/6c654aa207a4b673379db7a928b87a01d644676c/karen_theeditor_v2_strict_mistral_7b.Q8_0.gguf"
 # Initialize the model with GPU support
 llm = Llama(
@@ -64,16 +64,14 @@ def fetch_llm_response(text):
 #   corrections_doc: Populated with any corrections made during p
 def pre_process_document(input_doc, corrections_doc): 
     
-    ## REPLACE this with logic of the modified doc
-    modified_doc = deepcopy(input_doc)
+
     
     # logic for pre-processing Fonts, Australian Language Checks, etc. 
 
     # -- Need to uncomment following 3 lines - the code has not been tested here yet!
     
-    # from deterministic_preprocessor import DeterministicPreprocessor
-    # preprocessor = DeterministicPreprocessor()
-    #modified_doc, corrections_doc = preprocessor.pre_process_document(input_doc)
+    preprocessor = DeterministicPreprocessor()
+    modified_doc, corrections_doc = preprocessor.pre_process_document(input_doc)
     
     return modified_doc, corrections_doc
 
@@ -203,6 +201,7 @@ def process_document_tables(modified_doc, corrections_doc) :
 
 def proofread_and_correct_document( modified_doc, corrections_doc):
     corrections_doc.add_heading("Corrections Made", 0)
+    modified_doc, corrections_doc = pre_process_document(modified_doc, corrections_doc)
     modified_doc, corrections_doc = process_document_paragraphs(modified_doc, corrections_doc)
     modified_doc, corrections_doc = process_document_tables(modified_doc, corrections_doc)
 
