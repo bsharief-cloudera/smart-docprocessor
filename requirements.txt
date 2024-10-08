@@ -1,4 +1,20 @@
-llamacpp
-python-docx
+# web app
 Flask
 werkzeug
+
+# docx processing
+python-docx
+language-tool-python
+
+# llm hub
+huggingface-hub
+
+# llama cpp python bindings
+llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/metal
+
+# for docx tracked changes
+python_redlines @ git+https://github.com/JSv4/Python-Redlines@v0.0.5
+
+# for typing/data validation
+pydantic == 2.8.2
+pydantic-settings == 2.3.4
