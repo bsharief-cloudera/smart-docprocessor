@@ -1,10 +1,11 @@
 # imports and set up the local model
 from docx import Document
-from llama_cpp import Llama
+from llama_cpp import Llama, ChatCompletionRequestMessage
 from copy import deepcopy
 from smartdoc_utils import process_llm_output
 from deterministic_preprocessor import DeterministicPreprocessor
 from config import settings
+from prompts import general_prompt, system_prompt
 
 # Initialize the model with GPU support
 # llm = Llama(
@@ -20,8 +21,15 @@ llm = Llama.from_pretrained(
     n_ctx=16384,
 )
 
+# llm = Llama.from_pretrained(
+#     repo_id="lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF",
+#     filename="Meta-Llama-3.1-8B-Instruct-Q6_K.gguf",
+#     n_gpu_layers=-1,
+#     n_ctx=16384,
+# )
 
-def fetch_llm_response(text):
+
+def fetch_llm_response(text, prompt_template=general_prompt, sys_prompt=system_prompt):
     # Use the LLM to proofread and edit
     # prompt = (
     #     "<|system|>You are an expert editor who corrects spelling, formatting and grammatical errors<|end|>\n"
@@ -36,30 +44,27 @@ def fetch_llm_response(text):
     #     "<|end|>\n"
     #     "<|assistant|>\n"
     # )
-    prompt = (
-        "<|system|>You are an expert editor who corrects spelling, formatting and grammatical errors<|end|>\n"
-        "<|user|> ** TASK**  \n"
-        f"1. Edit the following text for spelling and grammar mistakes:  '{text}'\n"
-        f"2. Remove any formatting errors such as extra spaces"
-        f"**IMPORTANT** use the following template to format your response **."
-        f"1. Edited Text: "
-        f"[ Your corrected text here ]"
-        f"2. Corrections: "
-        f"[ Make a numbered list of your corrections ]"
-        "<|end|>\n"
-        "<|assistant|>\n"
-    )
     #        edited_text = llm(prompt, max_length=len(text) + 50)[0]['generated_text']
-    edited_text = llm(
-        prompt,
+    messages = [
+        {
+            "role": "system",
+            "content": sys_prompt,
+        },
+        {
+            "role": "user",
+            "content": prompt_template.format(text=text),
+        },
+    ]
+    edited_text = llm.create_chat_completion(
+        messages=messages,
         max_tokens=400,
         temperature=0.7,
         top_p=0.1,
         top_k=40,
         repeat_penalty=1.18,
     )
-    response_text = edited_text["choices"][0]["text"].strip()
-    print(f"PROMPT: \n {prompt} \n\n")
+    response_text = edited_text["choices"][0]["message"]["content"]
+    print(f"PROMPT: \n {prompt_template.format(text=text)} \n\n")
     print(f"LLM RESPONSE: \n{response_text}\n\n")
 
     return response_text

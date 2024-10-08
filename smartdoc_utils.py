@@ -15,7 +15,9 @@ model_output = """
    i) Fixed visibility distance from '35 km' to '35 miles.'
    j) Added missing word 'right way' before 'to summarize and favor some advisors is still to be found.'
 """
-def document_postprocessing( model_output): 
+
+
+def document_postprocessing(model_output):
     """
     Process the output from a language model to extract edited text and corrections.
 
@@ -46,10 +48,12 @@ def document_postprocessing( model_output):
 
     If the expected format is not found, the function may not extract information correctly.
     """
-    
+
     # Extract Edited Text
     edited_text_match = re.search(r"Edited Text: '([^']*)'", model_output)
-    edited_text = edited_text_match.group(1) if edited_text_match else "No edited text found."
+    edited_text = (
+        edited_text_match.group(1) if edited_text_match else "No edited text found."
+    )
 
     # Extract Corrections
     corrections_match = re.findall(r"(\b[a-z]\))(.+)", model_output)
@@ -63,7 +67,6 @@ def document_postprocessing( model_output):
         print(f"{i}. {correction}")
 
     return edited_text, corrections
-
 
 
 # def process_llm_output(llm_output):
@@ -96,6 +99,7 @@ def document_postprocessing( model_output):
 
 #     return edited_text, corrections
 
+
 def process_llm_output(response):
     """
     Process the output from a custom Large Language Model and extract
@@ -111,20 +115,28 @@ def process_llm_output(response):
     """
     # Extract Edited Text
     # Modify regex to capture edited text with or without quotes
-    #edited_text_match = re.search(r"1\. Edited Text:\s*(.*)", response)
-    edited_text_match = re.search(r"1\. Edited Text:\s*['\"]?(.*?)['\"]?\s*(?:\n|$)", response, re.DOTALL) 
-    edited_text = edited_text_match.group(1).strip() if edited_text_match else "No edited text found."
-    
+    # edited_text_match = re.search(r"1\. Edited Text:\s*(.*)", response)
+    edited_text_match = re.search(
+        r"1\. Edited Text:\s*['\"]?(.*?)['\"]?\s*(?:\n|$)", response, re.DOTALL
+    )
+    edited_text = (
+        edited_text_match.group(1).strip()
+        if edited_text_match
+        else "No edited text found."
+    )
+
     # Extract the corrections
     corrections_match = re.search(r"2\. Corrections:\s*(.*)", response, re.DOTALL)
-    corrections = corrections_match.group(1).strip() if corrections_match else "No corrections found."
-    
+    corrections = (
+        corrections_match.group(1).strip()
+        if corrections_match
+        else "No corrections found."
+    )
     print("INSIDE process_llm_output")
     # Print the results
     print("Edited Text:")
     print(edited_text)
     print("\nCorrections:")
     print(corrections)
-    print("DONE process_llm_output")        
+    print("DONE process_llm_output")
     return edited_text, corrections
-
