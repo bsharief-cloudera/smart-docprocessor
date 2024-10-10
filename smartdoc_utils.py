@@ -11,13 +11,12 @@ model_output = """
    c) Corrected the tense from 'start' to 'started'
    d) Corrected 'expeccted quality.' to 'expected quality.'
    e) Fixed "correct valu" to 'correct value.'
-   f) Corrected the position from 'rd' to '3rd'.
-   g) Fixed the time format to '10:30 am.'
-   h) Abbreviated '$1million' to '$1m.'
-   i) Corrected 'sunise' to 'sunrise.'
-   j) Changed 'visibilty' to 'visibility.'
-   k) Corrected 'too sumize' to 'to summarize.'
-   l) Fixed 'advisor's' to 'advisors'.
+   f) Fixed the time format to '10:30 am.'
+   g) Abbreviated '$1million' to '$1m.'
+   h) Corrected 'sunise' to 'sunrise.'
+   i) Changed 'visibilty' to 'visibility.'
+   j) Corrected 'too sumize' to 'to summarize.'
+   k) Fixed 'advisor's' to 'advisors'.
 """
 
 model_input_1 = """

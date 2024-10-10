@@ -5,8 +5,14 @@ from copy import deepcopy
 from smartdoc_utils import process_llm_output
 from deterministic_preprocessor import DeterministicPreprocessor
 from config import settings
-from prompts import karen_prompt, karen_system_prompt, llama_prompt, llama_system_prompt
-from llm_configs import karen_config, llama_config
+from prompts import (
+    karen_prompt,
+    karen_system_prompt,
+    llama_prompt,
+    llama_system_prompt,
+    gemma_prompt,
+)
+from llm_configs import karen_config, llama_config, gemma_config
 
 # Initialize the model with GPU support
 # llm = Llama(
@@ -32,9 +38,33 @@ from llm_configs import karen_config, llama_config
 # )
 
 # llama 3.1 8b q6_k_l
+# llm = Llama.from_pretrained(
+#     repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+#     filename="Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf",
+#     n_gpu_layers=-1,
+#     n_ctx=16384,
+# )
+
+# llama 3.2 3b fp16
+# llm = Llama.from_pretrained(
+#     repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
+#     filename="Llama-3.2-3B-Instruct-f16.gguf",
+#     n_gpu_layers=-1,
+#     n_ctx=16384,
+# )
+
+# gemma 2 9 b q6_k_l
+# llm = Llama.from_pretrained(
+#     repo_id="bartowski/gemma-2-9b-it-GGUF",
+#     filename="gemma-2-9b-it-Q6_K_L.gguf",
+#     n_gpu_layers=-1,
+#     n_ctx=8192,
+# )
+
+# qwen2.5 7b q6_k_l
 llm = Llama.from_pretrained(
-    repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
-    filename="Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf",
+    repo_id="bartowski/Qwen2.5-7B-Instruct-GGUF",
+    filename="Qwen2.5-7B-Instruct-Q6_K_L.gguf",
     n_gpu_layers=-1,
     n_ctx=16384,
 )
@@ -43,6 +73,10 @@ if "karen" in llm.model_path:
     generation_params = karen_config
     PROMPT_TEMPLATE = karen_prompt
     SYS_PROMPT = karen_system_prompt
+elif "gemma" in llm.model_path:
+    generation_params = gemma_config
+    PROMPT_TEMPLATE = gemma_prompt
+    SYS_PROMPT = None
 else:
     generation_params = llama_config
     PROMPT_TEMPLATE = llama_prompt
@@ -54,16 +88,24 @@ def fetch_llm_response(
     prompt_template=PROMPT_TEMPLATE,
     sys_prompt=SYS_PROMPT,
 ):
-    messages = [
-        {
-            "role": "system",
-            "content": sys_prompt,
-        },
-        {
-            "role": "user",
-            "content": prompt_template.format(text=text),
-        },
-    ]
+    if sys_prompt is None:
+        messages = [
+            {
+                "role": "user",
+                "content": prompt_template.format(text=text),
+            },
+        ]
+    else:
+        messages = [
+            {
+                "role": "system",
+                "content": sys_prompt,
+            },
+            {
+                "role": "user",
+                "content": prompt_template.format(text=text),
+            },
+        ]
     edited_text = llm.create_chat_completion(
         messages=messages,
         **generation_params,
