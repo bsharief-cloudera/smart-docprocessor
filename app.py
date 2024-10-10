@@ -35,7 +35,7 @@ def dummy_proofread(input_path, edit_path, correction_path):
     modified_doc.save(edit_path)
     corrections_doc.save(correction_path)
 
-    return "Processing completed successfully"
+    return modified_doc, corrections_doc
 
 
 @app.route("/")
@@ -60,18 +60,6 @@ def upload_file():
         input_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         file.save(input_path)
 
-        # Create paths for edit and corrections documents
-        edit_path = os.path.join(
-            app.config["UPLOAD_FOLDER"], filename.split(".")[0] + "_edited.docx"
-        )
-        correction_path = os.path.join(
-            app.config["UPLOAD_FOLDER"], filename.split(".")[0] + "_corrections.docx"
-        )
-        tracked_correction_path = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            filename.split(".")[0] + "_tracked_corrections.docx",
-        )
-
         flash("Document has been uploaded successfully!")
         return render_template("index.html", file_uploaded=True, filename=filename)
 
@@ -80,10 +68,12 @@ def upload_file():
 def proofread_document(filename):
     input_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     edit_path = os.path.join(
-        app.config["UPLOAD_FOLDER"], filename.split(".")[0] + "_edited.docx"
+        app.config["UPLOAD_FOLDER"],
+        filename.split(".")[0] + "_edited.docx",
     )
     correction_path = os.path.join(
-        app.config["UPLOAD_FOLDER"], filename.split(".")[0] + "_corrections.docx"
+        app.config["UPLOAD_FOLDER"],
+        filename.split(".")[0] + "_corrections.docx",
     )
     tracked_correction_path = os.path.join(
         app.config["UPLOAD_FOLDER"],
@@ -93,14 +83,19 @@ def proofread_document(filename):
     start_time = time.time()
 
     # Call the dummy proofreading function
-    result = dummy_proofread(input_path, edit_path, correction_path)
+    modified_doc, _ = dummy_proofread(input_path, edit_path, correction_path)
 
+    # track changes in docx file
     wrapper = XmlPowerToolsEngine()
     output = wrapper.run_redline(
         author_tag="smart-docprocessor",
         original=input_path,
         modified=edit_path,
     )
+
+    if os.path.exists(edit_path):
+        os.remove(edit_path)
+        modified_doc.save(edit_path)
 
     with open(tracked_correction_path, "wb") as f:
         f.write(output[0])

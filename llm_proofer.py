@@ -5,7 +5,8 @@ from copy import deepcopy
 from smartdoc_utils import process_llm_output
 from deterministic_preprocessor import DeterministicPreprocessor
 from config import settings
-from prompts import general_prompt, system_prompt
+from prompts import karen_prompt, karen_system_prompt, llama_prompt, llama_system_prompt
+from llm_configs import karen_config, llama_config
 
 # Initialize the model with GPU support
 # llm = Llama(
@@ -14,37 +15,45 @@ from prompts import general_prompt, system_prompt
 #     n_ctx=16384,  # adjust based on your GPU memory
 # )
 
-llm = Llama.from_pretrained(
-    repo_id="FPHam/Karen_TheEditor_V2_CREATIVE_Mistral_7B-Q6_K-GGUF",
-    filename="karen_theeditor_v2_creative_mistral_7b.Q6_K.gguf",
-    n_gpu_layers=-1,
-    n_ctx=16384,
-)
-
+# karen 7b q6_k creative
 # llm = Llama.from_pretrained(
-#     repo_id="lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF",
-#     filename="Meta-Llama-3.1-8B-Instruct-Q6_K.gguf",
+#     repo_id="FPHam/Karen_TheEditor_V2_CREATIVE_Mistral_7B-Q6_K-GGUF",
+#     filename="karen_theeditor_v2_creative_mistral_7b.Q6_K.gguf",
 #     n_gpu_layers=-1,
 #     n_ctx=16384,
 # )
 
+# karen 7b q6_k strict
+# llm = Llama.from_pretrained(
+#     repo_id="TheBloke/Karen_TheEditor_V2_STRICT_Mistral_7B-GGUF",
+#     filename="karen_theeditor_v2_strict_mistral_7b.Q6_K.gguf",
+#     n_gpu_layers=-1,
+#     n_ctx=16384,
+# )
 
-def fetch_llm_response(text, prompt_template=general_prompt, sys_prompt=system_prompt):
-    # Use the LLM to proofread and edit
-    # prompt = (
-    #     "<|system|>You are an expert editor who corrects spelling, formatting and grammatical errors<|end|>\n"
-    #     "<|user|> ** TASK**  \n"
-    #     f"1. Edit the following text for spelling and grammar mistakes:  '{text}'\n"
-    #     f"2. Remove any formatting errors such as extra spaces \n"
-    #     f"**IMPORTANT** use the following template to format your response **.\n"
-    #     f"1. Edited Text: \n"
-    #     f"[ Your corrected text here ]\n"
-    #     f"2. Corrections: \n"
-    #     f"[ list **each correction made here** ]\n"
-    #     "<|end|>\n"
-    #     "<|assistant|>\n"
-    # )
-    #        edited_text = llm(prompt, max_length=len(text) + 50)[0]['generated_text']
+# llama 3.1 8b q6_k_l
+llm = Llama.from_pretrained(
+    repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+    filename="Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf",
+    n_gpu_layers=-1,
+    n_ctx=16384,
+)
+
+if "karen" in llm.model_path:
+    generation_params = karen_config
+    PROMPT_TEMPLATE = karen_prompt
+    SYS_PROMPT = karen_system_prompt
+else:
+    generation_params = llama_config
+    PROMPT_TEMPLATE = llama_prompt
+    SYS_PROMPT = llama_system_prompt
+
+
+def fetch_llm_response(
+    text,
+    prompt_template=PROMPT_TEMPLATE,
+    sys_prompt=SYS_PROMPT,
+):
     messages = [
         {
             "role": "system",
@@ -57,13 +66,9 @@ def fetch_llm_response(text, prompt_template=general_prompt, sys_prompt=system_p
     ]
     edited_text = llm.create_chat_completion(
         messages=messages,
-        max_tokens=400,
-        temperature=0.7,
-        top_p=0.1,
-        top_k=40,
-        repeat_penalty=1.18,
+        **generation_params,
     )
-    response_text = edited_text["choices"][0]["message"]["content"]
+    response_text = edited_text["choices"][0]["message"]["content"].strip()
     print(f"PROMPT: \n {prompt_template.format(text=text)} \n\n")
     print(f"LLM RESPONSE: \n{response_text}\n\n")
 
@@ -230,9 +235,6 @@ def proofread_and_correct_document(modified_doc, corrections_doc):
     modified_doc, corrections_doc = process_document_tables(
         modified_doc, corrections_doc
     )
-
-    # final deterministic check
-    modified_doc, corrections_doc = pre_process_document(modified_doc, corrections_doc)
 
     return modified_doc, corrections_doc
 
