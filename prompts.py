@@ -44,7 +44,7 @@ llama_system_prompt = (
     "**RULES**\n"
     "* Analyze the text before editing it. \n"
     "* Follow British English spelling and grammar rules. Do not use American English. \n"
-    "* Fix spelling mistakes, punctuation errors, and grammatical errors. \n"
+    "* Please fix all spelling mistakes, punctuation errors, and grammatical errors. \n"
     "* Do not correct or expand any abbrieviations or acronyms you do not know about. \n"
     "* Do not rename any names or proper nouns. Capitalise the initials if "
     "needed, but do not rename names like aircraft names, base names, locations etc. \n"
@@ -53,6 +53,7 @@ llama_system_prompt = (
     "For example, do not add dates or months "
     "if they are not filled. \n"
     "* Remove any formatting errors such as extra spaces. \n"
+    "* Format phone numbers in Australian Format. \n"
     "\n**IMPORTANT**\nUse the following template to format your response."
     "1. Edited Text: \n"
     "{ Your corrected text here, blank if nothing is edited }\n"
@@ -63,7 +64,7 @@ llama_system_prompt = (
 )
 
 llama_prompt = (
-    "Use the following examples as reference.\n"
+    "Use the following examples as reference for editing.\n"
     "\n------------------------------------------------------------\n"
     "Example 1."
     "\n------------------------------------------------------------\n"

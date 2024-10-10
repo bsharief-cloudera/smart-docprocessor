@@ -9,33 +9,32 @@ model_output = """
    a) Removed extra spaces after 'I saw' and before 'These products are below expected quality.'
    b) Changed 'sample prodcut' to 'sample product.'
    c) Corrected the tense from 'start' to 'started'
-   d) Corrected 'expeccted quality.' to 'expected quality.'
-   e) Fixed "correct valu" to 'correct value.'
+   d) Corrected the spelling of 'expeccted quality.' to 'expected quality.'
+   e) Fixed the spelling "correct valu" to 'correct value.'
    f) Fixed the time format to '10:30 am.'
    g) Abbreviated '$1million' to '$1m.'
    h) Corrected 'sunise' to 'sunrise.'
-   i) Changed 'visibilty' to 'visibility.'
+   i) Fixed the spelling of'visibilty' to 'visibility.'
    j) Corrected 'too sumize' to 'to summarize.'
-   k) Fixed 'advisor's' to 'advisors'.
+   k) Fixed punctuation in 'advisor's' to 'advisors'.
 """
 
 model_input_1 = """
 'I read a article about new technology. These technologie are not very impresssive. I think the points he made are mostly valid. The value should be 15.3%% and in 2nd postion. The time is 9:45am. The object's width is 732cm and priced at $500,000. The moonrise occured at 0635 UTC and the visibility range is 40 miles. The correct strategy for optimizing results and consulting a specialist's insights remains unclear.'
 """
 model_output_1 = """
-1. Edited Text: 'I read an article about new technology. These technologies are not very impressive. I think the points he made are mostly valid. The value should be 15.3%% and in 2nd position. The time is 9:45 am. The object's width is 732 cm and priced at $500,000. The moonrise occurred at 0635 UTC and the visibility range is 40 miles. The correct strategy for optimizing results and consulting a specialist's insights remains unclear.'
+1. Edited Text: 'I read an article about new technology. These technologies are not very impressive. I think the points he made are mostly valid. The value should be 15.3%% and in 2nd position. The time is 9:45 am. The object's width is 732cm and priced at $500,000. The moonrise occurred at 0635 UTC and the visibility range is 40 miles. The correct strategy for optimizing results and consulting a specialist's insights remains unclear.'
 
 2. Corrections: 
    a) Changed 'I read a article' to 'I read an article.' 
-   b) Corrected 'technologie' to 'technologies.' 
-   c) Fixed 'impresssive' to 'impressive.' 
-   d) Corrected 'postion' to 'position.' 
-   e) Changed the time format to '9:45 am.' 
-   f) Added a space between '732' and 'cm.' 
-   g) Updated 'priced at $500,000' for clarity and consistency. 
-   h) Corrected 'occured' to 'occurred.' 
-   i) Replaced 'visibility is 40 miles' to 'visibility range is 40 miles.' 
-   j) Clarified 'correct strategy for optimizing results and consulting a specialist's insights remains unclear.'
+   b) Corrected spelling of 'technologie' to 'technologies.' 
+   c) Fixed spelling of 'impresssive' to 'impressive.' 
+   d) Corrected spelling of 'postion' to 'position.' 
+   e) Changed the time format to '9:45 am.'  
+   f) Updated 'priced at $500,000' for clarity and consistency. 
+   g) Corrected spelling of 'occured' to 'occurred.' 
+   h) Replaced 'visibility is 40 miles' to 'visibility range is 40 miles.' 
+   i) Clarified 'correct strategy for optimizing results and consulting a specialist's insights remains unclear.'
 """
 
 model_input_2 = """
